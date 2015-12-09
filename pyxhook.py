@@ -86,10 +86,10 @@ class HookManager(threading.Thread):
     def run(self):
         # Check if the extension is present
         if not self.record_dpy.has_extension("RECORD"):
-            print "RECORD extension not found"
+            print("RECORD extension not found")
             sys.exit(1)
         r = self.record_dpy.record_get_version(0, 0)
-        print "RECORD extension version %d.%d" % (r.major_version, r.minor_version)
+        print("RECORD extension version %d.%d" % (r.major_version, r.minor_version))
 
         # Create a recording context; we only want key and mouse events
         self.ctx = self.record_dpy.record_create_context(
@@ -119,7 +119,7 @@ class HookManager(threading.Thread):
         self.local_dpy.flush()
     
     def printevent(self, event):
-        print event
+        print(event)
     
     def HookKeyboard(self):
         pass
@@ -140,7 +140,7 @@ class HookManager(threading.Thread):
         if reply.category != record.FromServer:
             return
         if reply.client_swapped:
-            print "* received swapped protocol data, cowardly ignored"
+            print("* received swapped protocol data, cowardly ignored")
             return
         if not len(reply.data) or ord(reply.data[0]) < 2:
             # not an event

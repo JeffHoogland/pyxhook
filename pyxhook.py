@@ -49,7 +49,6 @@ from Xlib.protocol import rq
 
 class HookManager(threading.Thread):
     """This is the main class. Instantiate it, and you can hand it KeyDown and KeyUp (functions in your own code) which execute to parse the pyxhookkeyevent class that is returned.
-
     This simply takes these two values for now:
     KeyDown = The function to execute when a key is pressed, if it returns anything. It hands the function an argument that is the pyxhookkeyevent class.
     KeyUp = The function to execute when a key is released, if it returns anything. It hands the function an argument that is the pyxhookkeyevent class.
@@ -76,6 +75,7 @@ class HookManager(threading.Thread):
         self.KeyUp = lambda x: True
         self.MouseAllButtonsDown = lambda x: True
         self.MouseAllButtonsUp = lambda x: True
+        self.MouseMovement = lambda x: True
         
         self.contextEventMask = [X.KeyPress,X.MotionNotify]
         
@@ -164,7 +164,8 @@ class HookManager(threading.Thread):
                 # use mouse moves to record mouse position, since press and release events
                 # do not give mouse position info (event.root_x and event.root_y have 
                 # bogus info).
-                self.mousemoveevent(event)
+                hookevent = self.mousemoveevent(event)
+                self.MouseMovement(hookevent)
         
         #print "processing events...", event.type
 
@@ -225,6 +226,7 @@ class HookManager(threading.Thread):
     def mousemoveevent(self, event):
         self.mouse_position_x = event.root_x
         self.mouse_position_y = event.root_y
+        return self.makemousehookevent(event)
 
     # need the following because XK.keysym_to_string() only does printable chars
     # rather than being the correct inverse of XK.string_to_keysym()
@@ -268,6 +270,8 @@ class HookManager(threading.Thread):
             MessageName = MessageName + "down"
         elif event.type == X.ButtonRelease:
             MessageName = MessageName + "up"
+        else:
+            MessageName = "mouse moved"
         return pyxhookmouseevent(storewm["handle"], storewm["name"], storewm["class"], (self.mouse_position_x, self.mouse_position_y), MessageName)
     
     def xwindowinfo(self):
@@ -353,6 +357,7 @@ if __name__ == '__main__':
     hm.KeyUp = hm.printevent
     hm.MouseAllButtonsDown = hm.printevent
     hm.MouseAllButtonsUp = hm.printevent
+    hm.MouseMovement = hm.printevent
     hm.start()
     time.sleep(10)
     hm.cancel()

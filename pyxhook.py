@@ -142,7 +142,7 @@ class HookManager(threading.Thread):
         if reply.client_swapped:
             print("* received swapped protocol data, cowardly ignored")
             return
-        if not len(reply.data) or ord(reply.data[0]) < 2:
+        if not len(reply.data) or ord(str(reply.data[0])) < 2:
             # not an event
             return
         data = reply.data

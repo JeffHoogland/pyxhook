@@ -238,10 +238,7 @@ class HookManager(threading.Thread):
 
     def asciivalue(self, keysym):
         asciinum = XK.string_to_keysym(self.lookup_keysym(keysym))
-        if asciinum < 256:
-            return asciinum
-        else:
-            return 0
+        return asciinum % 256
     
     def makekeyhookevent(self, keysym, event):
         storewm = self.xwindowinfo()

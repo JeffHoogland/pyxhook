@@ -107,13 +107,13 @@ class HookManager(threading.Thread):
     def run(self):
         # Check if the extension is present
         if not self.record_dpy.has_extension("RECORD"):
-            print("RECORD extension not found")
+            print("RECORD extension not found", file=sys.stderr)
             sys.exit(1)
-        r = self.record_dpy.record_get_version(0, 0)
-        print("RECORD extension version {major}.{minor}".format(
-            major=r.major_version,
-            minor=r.minor_version
-        ))
+        # r = self.record_dpy.record_get_version(0, 0)
+        # print("RECORD extension version {major}.{minor}".format(
+        #     major=r.major_version,
+        #     minor=r.minor_version
+        # ))
 
         # Create a recording context; we only want key and mouse events
         self.ctx = self.record_dpy.record_create_context(

@@ -62,7 +62,7 @@ class HookManager(threading.Thread):
                   the pyxhookkeyevent class.
     """
 
-    def __init__(self):
+    def __init__(self,parameters=False):
         threading.Thread.__init__(self)
         self.finished = threading.Event()
 
@@ -90,13 +90,18 @@ class HookManager(threading.Thread):
         )))
         self.logrelease = re.compile('.*')
         self.isspace = re.compile('^space$')
-
+        # Choose which type of function use
+        self.parameters=parameters
+        if parameters:
+            self.lambda_function=lambda x,y: True
+        else:
+            self.lambda_function=lambda x: True
         # Assign default function actions (do nothing).
-        self.KeyDown = lambda x,y: True
-        self.KeyUp = lambda x,y: True
-        self.MouseAllButtonsDown = lambda x,y: True
-        self.MouseAllButtonsUp = lambda x,y: True
-        self.MouseMovement = lambda x,y: True
+        self.KeyDown = self.lambda_function
+        self.KeyUp = self.lambda_function
+        self.MouseAllButtonsDown = self.lambda_function
+        self.MouseAllButtonsUp = self.lambda_function
+        self.MouseMovement = self.lambda_function
         
         self.KeyDownParameters = {}
         self.KeyUpParameters = {}
@@ -168,6 +173,16 @@ class HookManager(threading.Thread):
         # self.contextEventMask[1] = X.MotionNotify
         pass
 
+    def processhookevents(self,action_type,action_parameters,events):
+        # In order to avoid duplicate code, i wrote a function that takes the
+        # input value of the action function and, depending on the initialization, 
+        # launches it or only with the event or passes the parameter
+        if self.parameters:
+            action_type(events,action_parameters)
+        else:
+            action_type(events)
+
+
     def processevents(self, reply):
         if reply.category != record.FromServer:
             return
@@ -193,22 +208,22 @@ class HookManager(threading.Thread):
             )
             if event.type == X.KeyPress:
                 hookevent = self.keypressevent(event)
-                self.KeyDown(hookevent,self.KeyDownParameters)
+                self.processhookevents(self.KeyDown,self.KeyDownParameters,hookevent)
             elif event.type == X.KeyRelease:
                 hookevent = self.keyreleaseevent(event)
-                self.KeyUp(hookevent,self.KeyUpParameters)
+                self.processhookevents(self.KeyUp,self.KeyUpParameters,hookevent)
             elif event.type == X.ButtonPress:
                 hookevent = self.buttonpressevent(event)
-                self.MouseAllButtonsDown(hookevent,self.MouseAllButtonsDownParameters)
+                self.processhookevents(self.MouseAllButtonsDown,self.MouseAllButtonsDownParameters,hookevent)
             elif event.type == X.ButtonRelease:
                 hookevent = self.buttonreleaseevent(event)
-                self.MouseAllButtonsUp(hookevent,self.MouseAllButtonsUpParameters)
+                self.processhookevents(self.MouseAllButtonsUp,self.MouseAllButtonsUpParameters,hookevent)
             elif event.type == X.MotionNotify:
                 # use mouse moves to record mouse position, since press and
                 # release events do not give mouse position info
                 # (event.root_x and event.root_y have bogus info).
                 hookevent = self.mousemoveevent(event)
-                self.MouseMovement(hookevent,self.MouseMovementParameters)
+                self.processhookevents(self.MouseMovement,self.MouseMovementParameters,hookevent)
 
         # print("processing events...", event.type)
 

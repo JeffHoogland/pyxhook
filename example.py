@@ -19,7 +19,6 @@ def kbevent(event,parameters):
 	if event.Ascii == 32:
 		parameters['running'] = False
 
-
 parameters={'running':True}
 # Create hookmanager
 hookman = pyxhook.HookManager()
@@ -33,12 +32,7 @@ hookman.HookKeyboard()
 hookman.start()
 
 # Create a loop to keep the application running
-#running = True
-
-print('Parameters before press:'+str(parameters))
 while parameters['running']:
 	time.sleep(0.1)
-# Use parametrs without global
-print('Parameters after press:'+str(parameters))
 # Close the listener when we are done
 hookman.cancel()

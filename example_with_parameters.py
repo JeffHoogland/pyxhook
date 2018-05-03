@@ -12,12 +12,12 @@ import time
 
 
 # This function is called every time a key is presssed
-def kbevent(event,parameters):
-	# print key info
-	print(event)
-	# If the ascii value matches spacebar, terminate the while loop
-	if event.Ascii == 32:
-		parameters['running'] = False
+def kbevent(event, params):
+    # print key info
+    print(event)
+    # If the ascii value matches spacebar, terminate the while loop
+    if event.Ascii == 32:
+        params['running'] = False
 
 parameters={'running':True}
 # Create hookmanager
@@ -33,6 +33,6 @@ hookman.start()
 
 # Create a loop to keep the application running
 while parameters['running']:
-	time.sleep(0.1)
+    time.sleep(0.1)
 # Close the listener when we are done
 hookman.cancel()
